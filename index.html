@@ -1,0 +1,127 @@
+<html>
+<head>
+  <link rel="stylesheet" href="./leaflet/leaflet.css"/>
+  <script src="./leaflet/leaflet.js"></script>
+  <style>
+    body {
+      display: flex;
+    }
+
+    #map-container {
+      width: 60%;
+      border: solid 1px red;
+    }
+
+    #interaction-container {
+      width: 40%;
+    }
+  </style>
+</head>
+<body>
+<div id="map-container"></div>
+<div id="interaction-container">
+  Orig: <input id="orig"><br/>
+  Dest: <input id="dest"><br/>
+  <button id="btn-search">Search</button>
+  <div id="search-result"></div>
+</div>
+<script src="./d3.v7.min.js"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=3.0&ak=vrdkaDGnbGWW2Aq4UFlOOjfUe76x3G9T"></script>
+<script src="https://cdn.bootcss.com/proj4js/2.4.3/proj4.js"></script>
+<script src="https://cdn.bootcss.com/proj4leaflet/1.0.1/proj4leaflet.min.js"></script>
+<script src="./tileLayer.baidu.js"></script>
+<script>
+let map = L.map("map-container").setView([51.505, -0.09], 13)
+
+L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  maxZoom: 19,
+  // attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(map)
+
+/* let map = L.map('map-container', {
+  crs: L.CRS.Baidu, // 坐标参考系统
+  minZoom: 1,
+  maxZoom: 18,
+  // attributionControl: false,
+  center: [44.576383600536744, 129.61037862555978],
+  zoom: 11,
+  // doubleClickZoom: false
+})
+L.tileLayer.baidu({ layer: 'custom', customid: 'grayscale', noWrap: false }).addTo(map) */
+
+let latlngs = []
+let latlngs1 = [
+    [45.51, -122.68],
+    // [37.77, -122.43],
+    [34.04, -118.2]
+];
+let latlngs2 = [
+    [[45.51, -122.68],
+     [37.77, -122.43],
+     [34.04, -118.2]],
+    [[40.78, -73.91],
+     [41.83, -87.62],
+     [32.76, -96.72]]
+];
+
+let polyline = L.polyline(latlngs, {color: 'steelblue'}).addTo(map);
+
+// zoom the map to the polyline
+// map.fitBounds(polyline.getBounds());
+
+d3.csv('./data.csv').then(data => {
+  console.log('data', data)
+
+  let points = data
+  .filter(d => d['Orig'] && d['Dest'])
+  // .map(d => {
+  //   let array = [ d['Orig'], d['Dest'] ]
+  //   array.sort()
+  //   // console.log('array', array)
+  //   if (array[0] == '') {
+  //     console.log('ddd', d)
+  //   }
+  //   return array.join(':')
+  // })
+
+  // let line = Array.from(new Set(points))
+  // line.sort()
+  // console.log(line)
+
+  d3.select('#btn-search').on('click', function() {
+    // console.log('this', this)
+
+    let orig = d3.select('#orig').node().value
+    let dest = d3.select('#dest').node().value
+
+    let filterData = []
+    if (orig && dest) {
+      filterData = points.filter(d => d['Orig'] == orig && d['Dest'] == dest)
+    } else if (orig && !dest) {
+      filterData = points.filter(d => d['Orig'] == orig)
+    } else if (!orig && dest) {
+      filterData = points.filter(d => d['Dest'] == dest)
+    }
+    console.log(orig, dest, filterData)
+
+    let newLatLngs = filterData.map(d => {
+      return [
+        [ d['Orig Lat'], d['Orig Lng'] ],
+        [ d['Dest Lat'], d['Dest Lng'] ],
+      ]
+    })
+    console.log('new', newLatLngs)
+
+    polyline.setLatLngs(newLatLngs)
+    map.fitBounds(polyline.getBounds())
+  })
+})
+
+// function filterData(data, orig, dest) {
+//   let filteredData = data.filter(d => d['Orig'] == orig && d['Dest'] == dest)
+//   // 去重
+// }
+
+</script>
+</body>
+</html>
