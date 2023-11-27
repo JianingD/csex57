@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Project Process Book</title>
+    <style>
+        img {
+            width: 500px;
+            height: 300px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Final Project Process Book</h1>
+    <p class="info">Name: Jianing Ding; E-Mail: d.jianing@wustl.edu.edu; UID: 511617</p>
+    <p class="info">Name: Peiqi He; E-Mail: h.peiqi@wustl.edu; UID: 515725</p>
+
+    <section id="part1">
+        <h2>Background and Motivation</h2>
+        <P> The goal of this project is to enhance the travel planning experience for Delta Air Lines' frequent flyers
+            by creating an interactive visualization of international flights operated by Delta in October. The motivation
+            is to provide a user-friendly tool for members to efficiently redeem their points and select the most convenient
+            flights based on location, time, and other specific preferences.
+        </P>
+    </section>
+
+    <section id="part2">
+        <h2>Related Work</h2>
+        <img src="img/flightrader.png" alt="flightradar24 website">
+        <P> This project is inspired by various flight visualization tools and heat maps that showcase global flight
+            patterns. Resources such as the 'FlightRadar24' website and academic papers on GIS (Geographic Information
+            System) applications in aviation have informed our approach. Discussions in class about interactive data
+            visualization have also played a pivotal role in shaping our design.
+        </P>
+    </section>
+
+    <section id="part3">
+        <h2>Questions</h2>
+        <h4>1. Where do international Delta flights depart from and arrive at?</h4>
+        <h4>2. What are the specific dates, times, and frequencies of these flights?</h4>
+        <h4>3. Which direct international routes are available?</h4>
+        <P> Throughout the project, these questions evolved to consider the user experience and the visual
+            representation of data. New questions included how to make the visualization more interactive and
+            informative, such as incorporating a search function or showing flight details on hover.
+        </P>
+    </section>
+
+    <section id="part4">
+        <h2>Data</h2>
+        <P> The data was sourced from Delta Air Lines' international flight schedule, available at Delta's official
+            website. The initial dataset was in an Excel format, which was cleaned and processed to enhance readability
+            and utility.
+        </P>
+    </section>
+
+    <section id="part5">
+        <h2>Exploratory Data Analysis:</h2>
+        <P> Initial visualizations included basic maps with plotted routes. Insights from these early visualizations
+            indicated the need for a more interactive approach, leading to the adoption of GeoJSON for more sophisticated
+            geographic representations.
+        </P>
+    </section>
+
+    <section id="part6">
+        <h2>Design Evolution:</h2>
+        <h4>1. A global map highlighting routes between the selected country and America.</h4>
+        <img src="img/heatmap_exg.png" alt="flight heat map">
+        <h4>2. A design showing all routes from a chosen departure city.</h4>
+        <h4>3. A searchable bar allowing users to input departure and arrival cities to display corresponding routes.</h4>
+        <img src="img/searchengine.png" alt="search engine">
+        <P> The final design chosen was the third option, providing a balance between interactivity and information
+            clarity.
+        </P>
+    </section>
+
+    <section id="part7">
+        <h2>Implementation:</h2>
+        <img src="img/currentstate.png" alt="current progress">
+        <P> The interactive visualizations are grounded on a GeoJSON-powered global map, with search functionality allowing
+            users to discover direct flight routes by entering departure and arrival cities. The map provides a
+            comprehensive view of Delta's international routes, aiding travelers in efficient trip planning.
+        </P>
+    </section>
+
+    <section id="part8">
+        <h2>Evaluation:</h2>
+        <P> The visualizations revealed patterns and insights such as key hubs for Delta and the most frequent international
+            routes. The effectiveness of the visualization was confirmed through user engagement, and future improvements
+            could include adding real-time flight status updates or incorporating user feedback mechanisms.
+        </P>
+
+    </section>
+</body>
+</html>

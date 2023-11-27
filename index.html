@@ -1,0 +1,273 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>CSE457 - Skynet Navigator</title>
+
+  <link rel="stylesheet" href="./leaflet/leaflet.css"/>
+  <script src="./leaflet/leaflet.js"></script>
+  <style>
+    h1, h3 {
+      font-family: 'Neuton', serif;
+      text-align: center;
+    }
+
+    h3 {
+      margin-top: 1px;
+      margin-bottom: 1px;
+      font-family: 'Neuton', serif;
+      text-align: center;
+    }
+
+    #find-flight-title {
+      margin-bottom: 0; /* Reduces space below the h2 element */
+    }
+
+    #example-flight {
+      margin-top: 0; /* Reduces space above the h3 element */
+    }
+
+    body {
+      display: flex;
+    }
+
+    #map-container {
+      width: 60%;
+      /* border: solid 1px red; */
+    }
+
+    #interaction-container {
+      width: 40%;
+      margin: 0px 0px 0px 20px;
+      line-height: 30px;
+    }
+
+    #search-result {
+      margin-top: 10px;
+      height: 90%;  /* table height */
+      overflow: scroll;
+    }
+
+    table {
+      font-size: 12px;
+    }
+    h1, h2, h3, h4 {
+      font-family: 'Times New Roman', sans-serif;
+      color: #333; /* This is a dark gray color */
+    }
+  </style>
+</head>
+<body>
+<div id="map-container"></div>
+<div id="interaction-container">
+  <h1>Nov. International Flights with Delta Airline </h1>
+  <h3>Jianing Ding 511617 d.jianing@wustl.edu.edu</h3>
+  <h3>Peiqi He 515725 h.peiqi@wustl.edu</h3>
+
+  <h2 id="find-flight-title"> Find your flight here!</h2>
+  <h4 id=" original airport "> Here is all original airport :ATL
+    BOS CVG DTW JFK LAX MCO MSP PDX RDU SEA SLC HNL ACC AMS ARN ATH BCN BER BRU CDG
+    CPH
+    CPT
+    DSS
+    DUB
+    DUS
+    EDI
+    FCO
+    FRA
+    GVA
+    JNB
+    LGW
+    LHR
+    LIS
+    LOS
+    MAD
+    MUC
+    MXP
+    NCE
+    STR
+    TLV
+    VCE
+    ZRH
+    AKL
+    HND
+    ICN
+    PPT
+    PVG
+    SYD
+    BOG
+    EZE
+    GRU
+    LIM
+    SCL
+    AUA
+    BDA
+    BON
+    BZE
+    CUN
+    GCM
+    GDL
+    GUA
+    HAV
+    KIN
+    LIR
+    MBJ
+    MEX
+    MIA
+    MTY
+    NAS
+    PLS
+    PTY
+    PUJ
+    PVR
+    RTB
+    SAL
+    SAP
+    SDQ
+    SJD
+    SJO
+    SJU
+    STI
+    STT
+    SXM
+    UIO
+    UVF</h4>
+  <h3 id="example-flight"> (e.g. ATL <i>Atlanta</i>  to AMS <i>Amsterdam</i>)</h3>
+  Orig: <input id="orig">&nbsp;
+  Dest: <input id="dest">&nbsp;
+  <button id="btn-search">Search</button>
+  <div id="search-result">
+    Query result: <br>
+    <table id="tb-result" border="1" cellspacing="1" cellpadding="4">
+      <thead>
+        <tr>
+          <th>Orig</th>
+          <th>Dest</th>
+          <th>Departs</th>
+          <th>Arrives</th>
+          <th>Fleet</th>
+          <th>Flight</th>
+          <th>DOW</th>
+          <th>Start Date</th>
+          <th>End Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- <tr>
+          <td>Orig</td>
+          <td>Dest</td>
+          <td>Departs</td>
+          <td>Arrives</td>
+          <td>Fleet</td>
+          <td>Flight</td>
+          <td>DOW</td>
+          <td>Start Date</td>
+          <td>End Date</td>
+        </tr> -->
+      </tbody>
+    </table>
+  </div>
+</div>
+<script src="./d3.v7.min.js"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=3.0&ak=vrdkaDGnbGWW2Aq4UFlOOjfUe76x3G9T"></script>
+<script src="https://cdn.bootcss.com/proj4js/2.4.3/proj4.js"></script>
+<script src="https://cdn.bootcss.com/proj4leaflet/1.0.1/proj4leaflet.min.js"></script>
+<script src="./tileLayer.baidu.js"></script>
+<script>
+let map = L.map("map-container").setView([51.505, -0.09], 13)
+
+L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  maxZoom: 19,
+  // attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  id: 'mapbox/light-v9'
+}).addTo(map)
+// http://t2.tianditu.cn/img_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=img&tileMatrixSet=w&TileMatrix={z}&TileRow={y}&TileCol={x}&style=default&format=tiles
+// https://tile.openstreetmap.org/{z}/{x}/{y}.png
+// http://webrd{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}
+// https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw
+
+
+/* let map = L.map('map-container', {
+  crs: L.CRS.Baidu, //
+  minZoom: 3,
+  maxZoom: 18,
+  // attributionControl: false,
+  center: [0, 0],
+  zoom: 3,
+  // doubleClickZoom: false,
+  // continuousWorld: true,
+  // worldCopyJump: false,
+  maxBounds: null,
+})
+L.tileLayer.baidu({ layer: 'custom', customid: 'grayscale', noWrap: false }).addTo(map) */
+
+let latlngs = []
+let latlngs1 = [
+    [45.51, -122.68],
+    // [37.77, -122.43],
+    [34.04, -118.2]
+];
+let latlngs2 = [
+    [[45.51, -122.68],
+     [37.77, -122.43],
+     [34.04, -118.2]],
+    [[40.78, -73.91],
+     [41.83, -87.62],
+     [32.76, -96.72]]
+];
+
+let polyline = L.polyline(latlngs, {color: 'steelblue'}).addTo(map);
+
+// zoom the map to the polyline
+// map.fitBounds(polyline.getBounds());
+
+d3.csv('./data.csv').then(data => {
+  // console.log('data', data)
+
+  let points = data
+  .filter(d => d['Orig'] && d['Dest'])
+
+  d3.select('#btn-search').on('click', function() {
+    let orig = d3.select('#orig').node().value
+    let dest = d3.select('#dest').node().value
+
+    let filterData = []
+    if (orig && dest) {
+      filterData = points.filter(d => d['Orig'] == orig && d['Dest'] == dest)
+    } else if (orig && !dest) {
+      filterData = points.filter(d => d['Orig'] == orig)
+    } else if (!orig && dest) {
+      filterData = points.filter(d => d['Dest'] == dest)
+    }
+    // console.log(orig, dest, filterData)
+
+    let newLatLngs = filterData.map(d => {
+      return [
+        [ d['Orig Lat'], d['Orig Lng'] ],
+        [ d['Dest Lat'], d['Dest Lng'] ],
+      ]
+    })
+    // console.log('new', newLatLngs)
+
+    polyline.setLatLngs(newLatLngs)
+    map.fitBounds(polyline.getBounds())
+
+    showData(filterData)
+  })
+})
+
+function showData(filterData) {
+  let trows = d3.select('#tb-result').select('tbody')
+  .selectAll('tr')
+  .data(filterData)
+  .join('tr')
+
+  trows.selectAll('td')
+  .data(d => ([ [d['Orig']], d['Dest'], d['Departs'], d['Arrives'], d['Fleet'], d['Flight'], d['DOW'], d['Start Date'], d['End Date'] ]))
+  .join('td')
+  .html(d => d)
+  // 								
+}
+
+</script>
+</body>
+</html>
